@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do App</title>
+    <style>
+        body{
+            background-image: url(https://static0.howtogeekimages.com/wordpress/wp-content/uploads/2025/04/tux-wearing-a-fedora-holding-a-to-do-list-1.png?w=1600&h=900&fit=crop);
+            background-color: rgb(53, 206, 241);
+            font-family: Arial, sans-serif;
+        }
+        .Main{
+            width: 50vw;
+            min-height: 80vh;
+            background-color: rgba(255, 255, 255, 0.4);
+            position: relative;
+            left: 25vw;
+            top: 10vh;
+            border-radius: 20px;
+            text-align: center;
+            padding: 20px;
+        }
+        .Main h1{
+            color: rgba(0, 0, 0, 0.685);
+        }
+        h1{
+            color: white;
+        }
+        input{
+            font-size: large;
+            padding: 5px;
+            border-radius: 5px;
+        }
+        button{
+            font-size: large;
+            background-color: rgb(14, 103, 245);
+            color: white;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        .task{
+            background: white;
+            color: black;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .counter{
+            color: white;
+            margin-top: 10px;
+            font-size: large;
+        }
+        button2{
+            font-size: large;
+            background-color: rgb(245, 118, 14);
+            color: white;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        button1{
+            font-size: large;
+            background-color: rgb(0, 210, 225);
+            color: white;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="Main">
+    <h1>TO-DO LIST</h1>
+    <input type="text" id="todoinput" placeholder="Enter task">
+    <button onclick="addTask()">Add</button>
+
+    <div class="counter">
+        Total Tasks: <span id="taskcount">0</span>
+    </div>
+
+    <div id="todolist"></div>
+</div>
+
+<script>
+
+    // Load tasks when page opens
+    window.onload = function(){
+        loadTasks();
+    }
+
+    function addTask(){
+        let input = document.getElementById("todoinput");
+        let taskValue = input.value.trim();
+
+        if(taskValue === "") return;
+
+        createTaskElement(taskValue);
+
+        saveTask(taskValue);
+
+        input.value = "";
+        updateCounter();
+    }
+
+    function createTaskElement(taskValue){
+        let taskDiv = document.createElement("div");
+        taskDiv.className = "task";
+
+        let span = document.createElement("span");
+        span.innerText = taskValue;
+
+        let editBtn = document.createElement("button1");
+        editBtn.innerText = "Edit";
+        editBtn.onclick = function(){
+            let newTask = prompt("Edit your task:", span.innerText);
+            if(newTask !== null && newTask.trim() !== ""){
+                updateLocalStorage(span.innerText, newTask);
+                span.innerText = newTask;
+            }
+        }
+
+        let removeBtn = document.createElement("button2");
+        removeBtn.innerText = "Remove";
+        removeBtn.onclick = function(){
+            deleteTask(span.innerText);
+            taskDiv.remove();
+            updateCounter();
+        }
+
+        let btnGroup = document.createElement("div");
+        btnGroup.appendChild(editBtn);
+        btnGroup.appendChild(removeBtn);
+
+        taskDiv.appendChild(span);
+        taskDiv.appendChild(btnGroup);
+
+        document.getElementById("todolist").appendChild(taskDiv);
+    }
+
+    function saveTask(task){
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        tasks.push(task);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function deleteTask(task){
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        tasks = tasks.filter(t => t !== task);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function updateLocalStorage(oldTask, newTask){
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        let index = tasks.indexOf(oldTask);
+        if(index > -1){
+            tasks[index] = newTask;
+        }
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+
+    function loadTasks(){
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        tasks.forEach(task => createTaskElement(task));
+        updateCounter();
+    }
+
+    function updateCounter(){
+        let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        document.getElementById("taskcount").innerText = tasks.length;
+    }
+
+</script>
+
+</body>
+</html>
